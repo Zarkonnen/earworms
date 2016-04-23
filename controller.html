@@ -67,7 +67,7 @@
 var colors = ['FF0000','FF6A00','7F0037','7F0000','404040','000000','FF006E','808080','FF00DC','007F0E','B6FF00','00FF21','0026FF','FFD800','D8C7E7','BC6BC5','C43E5B','714916','74A33C','B7F9A5','43DDBF','1A7A9D','1B3E68','2A1C48','E1BE3C','CBCE3A','F88835','963FB1','E1E287','D5C838','C294D5','DA48A9','483C0F','342D6B','7C8122','A1F7C9'];
 var airconsole = new AirConsole({orientation: AirConsole.ORIENTATION_LANDSCAPE});
 airconsole.onActivePlayersChange = function(player) {
-	document.getElementById("right").style.background = "#ff0000";
+	document.getElementById("right").style.background = "#" + colors[player % colors.length];
 };
 CtrlGenerator.setAirConsole(airconsole);
 CtrlGenerator.generate({"left":{"type":{"label":"Joystick","class_name":"Joystick"}},"middle":[],"right":[/*{"type":{"label":"ButtonVertical","class_name":"Button"},"label":"Play","key":"P","on_up_message":true}*/]});
