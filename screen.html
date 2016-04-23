@@ -1,0 +1,179 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.3.0.js"></script>
+    <script type="text/javascript">
+      var airconsole;
+      var avatars = [];
+      var canvas;
+      var last = null;
+
+      /**
+       * Sets up the communication to game pads.
+       */
+      function setupConsole() {
+        airconsole = new AirConsole();
+
+        airconsole.onConnect = function(device_id) {
+					avatars.push({
+						"x": 20,
+						"y": 20,
+						"move": { "x": 0, "y": 0} 
+					});
+          checkAtLeastTwoPlayers();
+        };
+
+        airconsole.onDisconnect = function(device_id) {
+					var player = airconsole.convertDeviceIdToPlayerNumber(device_id);
+					avatars.splice(player, 1);
+          checkAtLeastTwoPlayers();
+        };
+
+        airconsole.onMessage = function(device_id, data) {
+          var player = airconsole.convertDeviceIdToPlayerNumber(device_id);
+          if (player != undefined && data.move !== undefined) {
+            avatars[player].move = data.move;
+          }
+        };
+      }
+
+      /**
+       * Checks if two players are connected!
+       */
+      function checkAtLeastTwoPlayers() {
+        var active_players = airconsole.getActivePlayerDeviceIds();
+        var connected_controllers = airconsole.getControllerDeviceIds();
+        if (connected_controllers.length >= 2) {
+          airconsole.setActivePlayers(connected_controllers.length);
+          document.getElementById("wait").innerHTML = "";
+        } else {
+					airconsole.setActivePlayers(0);
+          document.getElementById("wait").innerHTML = "Need " + (2 - connected_controllers.length) + " more player(s)!";
+        }
+      }
+
+      /**
+       * body.onload function.
+       */
+      function init() {
+        setupConsole();
+
+        // Setting up the game. Nothing AirConsole specific.
+
+        canvas = document.getElementById("canvas");
+        avatars = [];
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        window.onresize = (clearCanvas);
+        last = new Date().getTime();
+        loop();
+      }
+
+      /**
+       * Moving the ball and drawing the canvas. Nothing AirConsole specific.
+       */
+      function loop() {
+        var now = new Date().getTime();
+        var delta = (now - last);
+        delta = Math.min(20, delta);
+        delta /= 1000;
+        last = now;
+        draw(true);
+				avatars.forEach(function(p) {
+	        p.x += p.move.x*delta;
+	        p.y += p.move.y*delta;
+					p.x = Math.max(0, Math.min(100, p.x));
+					p.y = Math.max(0, Math.min(100, p.y));
+				});
+        draw();
+
+        requestAnimationFrame(loop);
+      }
+
+      function clearCanvas() {
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black";
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+      }
+
+      /**
+       * Drawing the game scene. Nothing Game Console specific.
+       * @param clear
+       */
+      function draw(clear) {
+				if (clear) { clearCanvas(); }
+        // Draw
+        var ctx = canvas.getContext("2d");
+        var zoom = canvas.clientHeight / 100;
+        function c(x) {
+          x *= zoom;
+          return x | 0; // round
+        }
+        ctx.fillStyle = 'white';
+				
+				avatars.forEach(function(a) {
+        	ctx.beginPath();
+        	ctx.arc(c(a.x), c(a.y), c(5), 0, 2 * Math.PI, false);
+        	ctx.fill();
+        	ctx.closePath();
+				});
+      }
+    </script>
+    <style type="text/css">
+      @font-face {
+        font-family: 'PressStart2P';
+        src: url('PressStart2P.ttf') format('truetype');
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0px;
+        font-family: 'PressStart2P', sans-serif;
+        color: white;
+        text-align: center;
+      }
+
+      .game {
+        background-color: black;
+        top: 50%;
+        margin-top: -25%;
+        padding-bottom: 50%;
+        overflow: hidden;
+        position: relative;
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0px;
+        left:0px;
+        width: 100%;
+        height: 100%;
+      }
+
+      #score {
+        position: absolute;
+        top: 10%;
+        left: 0px;
+        width: 100%;
+        font-size: 48px;
+      }
+
+      #wait {
+        position: absolute;
+        top: 10%;
+        margin-top: 80px;
+        left: 0px;
+        width: 100%;
+        font-size: 24px;
+        color: lime;
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    <div class="game">
+      <canvas id="canvas"></canvas>
+      <div id="wait"></div>
+    </div>
+  </body>
+</html>
