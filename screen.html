@@ -75,19 +75,18 @@
 		}
 
 		function conditionalUpdateEarworm() {
-			var mostPopularSongId = currentWorm;
+			var mostPopularSong = null;
 			var mostPopularSongCount = 0;
 			earworms.forEach(function(e) {
 				if (e.count > mostPopularSongCount)
 				{
 					mostPopularSongCount = e.count;
-					mostPopularSongId = e.id;
+					mostPopularSong = e;
 				}
 			});
 			
-			if (mostPopularSongId != currentWorm)
-			{
-				switchTo(mostPopularSongId);
+			if (mostPopularSong) {
+				switchTo(mostPopularSong);
 			}
 		}
 		
