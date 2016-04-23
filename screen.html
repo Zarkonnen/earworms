@@ -78,17 +78,64 @@
         delta /= 1000;
         last = now;
         draw(true);
-				avatars.forEach(function(p) {
-	        p.x += p.move.x*delta;
-	        p.y += p.move.y*delta;
-					p.x = Math.max(0, Math.min(100, p.x));
-					p.y = Math.max(0, Math.min(100, p.y));
-				});
+		
+		avatars.forEach(function(p) {
+			moveAvatar(p, delta);
+		});
         draw();
 
+		checkSoundCones();
         requestAnimationFrame(loop);
       }
 
+	  function moveAvatar(p, delta) {
+		p.x += p.move.x*delta;
+		p.y += p.move.y*delta;
+		p.x = Math.max(0, Math.min(100, p.x));
+		p.y = Math.max(0, Math.min(100, p.y));
+	  }
+	  
+	  function getConeCorners(a, avatarRadius) {
+		var corners = [];
+		var coneWidth = 20;
+		var coneLength = 30;
+		corners.push({"x": a.x, "y": a.y - avatarRadius});
+		corners.push({"x": a.x + coneWidth / 2, "y": a.y + coneLength});
+		corners.push({"x": a.x - coneWidth / 2, "y": a.y + coneLength});
+		return corners;
+	  }
+	  
+	  function checkSoundCones() {
+		for (i=0;i<avatars.length;i++)
+		{
+			for (j=0;j<avatars.length;j++)
+			{
+				if (i != j)
+				{
+					corners = getConeCorners(avatars[i], 5);
+					if (PointInTriangle({"x": avatars[j].x, "y": avatars[j].y}, corners[0], corners[1], corners[2]))
+					{
+						console.log("Avatar " + j + " inside cone " + i);
+					}					
+				}
+			}
+		}
+
+		function sign (p1, p2, p3) {
+			return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+		}
+
+		function PointInTriangle (point, corner1, corner2, corner3) {
+			var b1, b2, b3;
+
+			b1 = sign(point, corner1, corner2) < 0;
+			b2 = sign(point, corner2, corner3) < 0;
+			b3 = sign(point, corner3, corner1) < 0;
+
+			return ((b1 == b2) && (b2 == b3));
+		}
+	}
+	  
       function clearCanvas() {
         var ctx = canvas.getContext("2d");
         ctx.fillStyle = "black";
@@ -96,7 +143,7 @@
         canvas.height = canvas.clientHeight;
         ctx.fillRect(0,0, canvas.width, canvas.height);
       }
-
+	  
       /**
        * Drawing the game scene. Nothing Game Console specific.
        * @param clear
@@ -107,19 +154,19 @@
         var ctx = canvas.getContext("2d");
         var zoom = canvas.clientHeight / 100;
 		var avatarRadius = 5;
-		var coneWidth = 20;
-		var coneLength = 30;
 		
+		function c(x) {
+		  x *= zoom;
+		  return x | 0; // round
+		}
+
 		// scale to screen
-        function c(x) {
-          x *= zoom;
-          return x | 0; // round
-        }
         ctx.fillStyle = 'white';
 		
 		// draw all sound cones
 		avatars.forEach(function(a) {
-			drawTriangle(ctx, a.x, a.y - avatarRadius, coneWidth, coneLength, 'green');
+			var corners = getConeCorners(a, avatarRadius);
+			drawTriangle(ctx, corners, 'green');
 		});
 		
 		// draw all avatars
@@ -135,18 +182,21 @@
 			context.closePath();
 		}
 		
-		function drawTriangle(context, x, y, triangleWidth, triangleHeight, fillStyle)
+		function drawTriangle(context, corners, fillStyle)
 		{
-			context.beginPath();
-			context.moveTo(c(x), c(y));
-			context.lineTo(c(x + triangleWidth / 2), c(y + triangleHeight));
-			context.lineTo(c(x - triangleWidth / 2), c(y + triangleHeight));
-			context.closePath();
-			
-			var oldStyle = context.fillStyle;
-			context.fillStyle = fillStyle;
-			context.fill();
-			context.fillStyle = oldStyle;
+			if (corners.length > 2)
+			{
+				context.beginPath();
+				context.moveTo(c(corners[0].x), c(corners[0].y));
+				context.lineTo(c(corners[1].x), c(corners[1].y));
+				context.lineTo(c(corners[2].x), c(corners[2].y));
+				context.closePath();
+				
+				var oldStyle = context.fillStyle;
+				context.fillStyle = fillStyle;
+				context.fill();
+				context.fillStyle = oldStyle;
+			}
 		}
       }
 	  
