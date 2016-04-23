@@ -90,8 +90,9 @@
 
         airconsole.onMessage = function(device_id, data) {
           var player = airconsole.convertDeviceIdToPlayerNumber(device_id);
-          if (player != undefined && data.move !== undefined) {
-            avatars[player].move = data.move;
+          if (player != undefined && data["joystick-left"] !== undefined && data["joystick-left"].message !== undefined) {
+            avatars[player].move.x = data["joystick-left"].message.x || 0;
+			avatars[player].move.y = data["joystick-left"].message.y || 0;
           }
         };
       }
