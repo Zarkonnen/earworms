@@ -98,7 +98,7 @@
         airconsole = new AirConsole();
 
 		// add NPCs
-		var numNPCs = 5;
+		var numNPCs = 15;
 		for(i=0; i < numNPCs; i++)
 		{
 			var randomX = Math.random() * 80 + 20;
@@ -223,6 +223,7 @@
 						});
 						
 						avatars[j].songId = avatars[i].songId;
+						avatars[j].dead = true;
 						// TODO: disable controls
 						earworms[avatars[i].songId].count++;
 						convertedSomeone = true;
@@ -315,6 +316,7 @@
 		
 		// draw all sound cones
 		avatars.forEach(function(a) {
+			if (a.dead) { return; }
 			ctx.translate(c(a.x), c(a.y));
 			if (a.move.x == 0 && a.move.y == 0) {
 				
@@ -335,6 +337,8 @@
 		
 		// draw all avatars
 		avatars.forEach(function(a, i) {
+			if (a.dead) { return; }
+			
 			ctx.fillStyle = "#" + colors[i % colors.length];
 			drawCircle(ctx, a.x, a.y, 2);
 		});
