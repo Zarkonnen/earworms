@@ -106,19 +106,50 @@
         // Draw
         var ctx = canvas.getContext("2d");
         var zoom = canvas.clientHeight / 100;
+		var avatarRadius = 5;
+		var coneWidth = 20;
+		var coneLength = 30;
+		
+		// scale to screen
         function c(x) {
           x *= zoom;
           return x | 0; // round
         }
         ctx.fillStyle = 'white';
-				
-				avatars.forEach(function(a) {
-        	ctx.beginPath();
-        	ctx.arc(c(a.x), c(a.y), c(5), 0, 2 * Math.PI, false);
-        	ctx.fill();
-        	ctx.closePath();
-				});
+		
+		// draw all sound cones
+		avatars.forEach(function(a) {
+			drawTriangle(ctx, a.x, a.y - avatarRadius, coneWidth, coneLength, 'green');
+		});
+		
+		// draw all avatars
+		avatars.forEach(function(a) {
+			drawCircle(ctx, a.x, a.y, avatarRadius);
+		});
+
+		function drawCircle(context, x, y, radius)
+		{
+			context.beginPath();
+			context.arc(c(x), c(y), c(radius), 0, 2 * Math.PI, false);
+			context.fill();
+			context.closePath();
+		}
+		
+		function drawTriangle(context, x, y, triangleWidth, triangleHeight, fillStyle)
+		{
+			context.beginPath();
+			context.moveTo(c(x), c(y));
+			context.lineTo(c(x + triangleWidth / 2), c(y + triangleHeight));
+			context.lineTo(c(x - triangleWidth / 2), c(y + triangleHeight));
+			context.closePath();
+			
+			var oldStyle = context.fillStyle;
+			context.fillStyle = fillStyle;
+			context.fill();
+			context.fillStyle = oldStyle;
+		}
       }
+	  
     </script>
     <style type="text/css">
       @font-face {
