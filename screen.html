@@ -52,6 +52,7 @@
 		].map(function(id) {
 			return {
 				"id": id,
+				"count": 0,
 				"howl": new Howl({
 					"urls": ["music/" + id + ".ogg", "music/" + id + ".wav"],
 					"loop": true
@@ -69,12 +70,43 @@
 			currentWorm = earworm;
 		}
 
+		function conditionalUpdateEarworm() {
+			var mostPopularSongId = currentWorm;
+			var mostPopularSongCount = 0;
+			earworms.forEach(function(e) {
+				if (e.count > mostPopularSongCount)
+				{
+					mostPopularSongCount = e.count;
+					mostPopularSongId = e.id;
+				}
+			});
+			
+			if (mostPopularSongId != currentWorm)
+			{
+				switchTo(mostPopularSongId);
+			}
+		}
+		
       /**
        * Sets up the communication to game pads.
        */
       function setupConsole() {
+//		switchTo(earworms[Math.random() * earworms.length]);
         airconsole = new AirConsole();
 
+		// add NPCs
+		var numNPCs = 5;
+		for(i=0; i < numNPCs; i++)
+		{
+			var randomX = Math.random() * 80 + 20;
+			var randomY = Math.random() * 50 + 20;
+			npcs.push({
+					"x": randomX,
+					"y": randomY,
+					"songId": -1
+			});
+		}
+		
         airconsole.onConnect = function(device_id) {
 			var newPlayerId = avatars.length;
 			var randomX = Math.random() * 80 + 20;
@@ -115,7 +147,7 @@
           airconsole.setActivePlayers(connected_controllers.length);
           document.getElementById("wait").innerHTML = "";
         } else {
-					airconsole.setActivePlayers(0);
+		  airconsole.setActivePlayers(0);
           document.getElementById("wait").innerHTML = "Need " + (2 - connected_controllers.length) + " more player(s)!";
         }
       }
@@ -165,6 +197,8 @@
 	  }
 	  
 	  function checkSoundCones() {
+	  
+		var convertedSomeone = false;
 		for (i=0;i<avatars.length;i++)
 		{
 			for (j=0;j<avatars.length;j++)
@@ -176,10 +210,42 @@
 						console.log("Avatar " + j + " inside cone " + i + 
 									" -> change song to " + earworms[avatars[i].songId] + " (id " + avatars[i].songId + ")");
 
+						// clear all npcs with the same song id
+						npcs.forEach(function(p) {
+							if (p.songId == avatars[j].songId)
+							{
+								earworms[p.songId].count--;
+								p.songId = -1;
+							}
+						});
+						
 						avatars[j].songId = avatars[i].songId;
-						// Release all NPCs.
+						// TODO: disable controls
+						earworms[avatars[i].songId].count++;
+						convertedSomeone = true;
 					}					
 				}
+			}
+
+			for (j=0;j<npcs.length;j++)
+			{
+				if (npcs[j].songId == -1)
+				{
+					if (PointInTriangle({"x": avatars[j].x, "y": avatars[j].y}, corners[0], corners[1], corners[2]))
+					{
+						console.log("NPC " + j + " inside cone " + i + 
+									" -> change song to " + earworms[avatars[i].songId] + " (id " + avatars[i].songId + ")");
+
+						npcs[j].songId = avatars[i].songId;
+						earworms[avatars[i].songId].count++;
+						convertedSomeone = true;
+					}					
+				}
+			}
+
+			if (convertedSomeone)
+			{
+				conditionalUpdateEarworm();
 			}
 		}
 	}
