@@ -344,9 +344,10 @@
 		});
 		
 		npcs.forEach(function(n, i) {
+			if (!n.songId) { return; }
 			if (n.songId == -1) { return; }
 			ctx.fillStyle = colors[n.songId % colors.length];
-			drawCircle(ctx, a.x, a.y, 2);
+			drawCircle(ctx, n.x, n.y, 2);
 		});
 		
 		/*if (avatars.length > 0) {
