@@ -30,8 +30,9 @@
 
         airconsole.onMessage = function(device_id, data) {
           var player = airconsole.convertDeviceIdToPlayerNumber(device_id);
-          if (player != undefined && data.move !== undefined) {
-            avatars[player].move = data.move;
+          if (player != undefined && data["joystick-left"] !== undefined && data["joystick-left"].message !== undefined) {
+            avatars[player].move.x = data["joystick-left"].message.x || 0;
+						avatars[player].move.y = data["joystick-left"].message.y || 0;
           }
         };
       }
@@ -79,8 +80,8 @@
         last = now;
         draw(true);
 				avatars.forEach(function(p) {
-	        p.x += p.move.x*delta;
-	        p.y += p.move.y*delta;
+	        p.x += p.move.x*delta*10;
+	        p.y += p.move.y*delta*10;
 					p.x = Math.max(0, Math.min(100, p.x));
 					p.y = Math.max(0, Math.min(100, p.y));
 				});
