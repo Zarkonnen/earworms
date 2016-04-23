@@ -1,84 +1,92 @@
-<html>
+﻿<html>
   <head>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.3.0.js"></script>
     <script type="text/javascript" src="howler.min.js"></script>
     <script type="text/javascript">
       var airconsole;
       var avatars = [];
+	  var npcs = [];
       var canvas;
       var last = null;
-			var currentWorm = null;
-			
-			var earworms = [
-				"01 - Chumbawamba - Tubthumping",
-				"01-dario_g-carneval_de_paris__stadium_radio_edit-pulse",
-				"02 Katamari on the Rock ~ Main Theme",
-				"04-koji_kondo-overworld_bgm_-_warning_-_overworld_bgm_(hurry_up)-fntx",
-				"06. Haddaway - What Is Love ",
-				"08 - Enjoy The Silence!!s",
-				"18 - Andreas Dorau & Die Marinas - Fred Vom Jupiter",
-				"104_rihanna_feat_jay_z_-_umbrella",
-				"AHA-TAKE ON ME",
-				"anouschka renzi - robot love",
-				"Bee Gees - Staying Alive-1",
-				"BELINDA-CARLISLE-HEAVEN IS A PLACE ON-EARTH",
-				"Bellini - Samba De Janeiro (Club Mix)",
-				"COTTON_EYE_JOE_(REDNEX)",
-				"d.j. bobo - somebody dance with me",
-				"dead or alive - you spin me round",
-				"desireless - voyage voyage",
-				"Dire Straits - Walk Of Life",
-				"eric prydz - generate",
-				"eurhythmics - sweet dreams",
-				"Fool´s Garden - Lemon tree",
-				"Gorillaz - Clint Eastwood (FULL VERSION)",
-				"James Last - Medley - Happy Music; Mexican Hat Dance",
-				"Kylie Minogue - Cant Get You Out Of My Head (Extended)",
-				"Laura Branigan  Self Control",
-				"madonna-vogue",
-				"Men at work - Down Under",
-				"michael jackson - bad [1987] - 10 - smooth criminal",
-				"michael jackson - thriller [1984] (r&b) - 04 - thriller",
-				"michael jackson - thriller [1984] (r&b) - 06 - billie jean",
-				"NENA - 99 LUFTBALLONS",
-				"Opus - Live Is Life",
-				"ryan paris - dolce vita",
-				"sabrina - boys",
-				"sandra - everlasting love",
-				"yello - oh yeah",
-			].map(function(id) {
-				return {
-					"id": id,
-					"howl": new Howl({
-						"urls": ["music/" + id + ".ogg", "music/" + id + ".wav"],
-						"loop": true
-					})
-				}
-			});
-			
-			function switchTo(earworm) {
-				if (earworm == currentWorm) { return; }
-				if (currentWorm) {
-					currentWorm.howl.fadeOut(0, 1000);
-				}
-				earworm.howl.fadeIn(1, 1000);
-				currentWorm = earworm;
+		var currentWorm = null;
+		
+		var earworms = [
+			"01 - Chumbawamba - Tubthumping",
+			"01-dario_g-carneval_de_paris__stadium_radio_edit-pulse",
+			"02 Katamari on the Rock ~ Main Theme",
+			"04-koji_kondo-overworld_bgm_-_warning_-_overworld_bgm_(hurry_up)-fntx",
+			"06. Haddaway - What Is Love ",
+			"08 - Enjoy The Silence!!s",
+			"18 - Andreas Dorau & Die Marinas - Fred Vom Jupiter",
+			"104_rihanna_feat_jay_z_-_umbrella",
+			"AHA-TAKE ON ME",
+			"anouschka renzi - robot love",
+			"Bee Gees - Staying Alive-1",
+			"BELINDA-CARLISLE-HEAVEN IS A PLACE ON-EARTH",
+			"Bellini - Samba De Janeiro (Club Mix)",
+			"COTTON_EYE_JOE_(REDNEX)",
+			"d.j. bobo - somebody dance with me",
+			"dead or alive - you spin me round",
+			"desireless - voyage voyage",
+			"Dire Straits - Walk Of Life",
+			"eric prydz - generate",
+			"eurhythmics - sweet dreams",
+			"Fool´s Garden - Lemon tree",
+			"Gorillaz - Clint Eastwood (FULL VERSION)",
+			"James Last - Medley - Happy Music; Mexican Hat Dance",
+			"Kylie Minogue - Cant Get You Out Of My Head (Extended)",
+			"Laura Branigan  Self Control",
+			"madonna-vogue",
+			"Men at work - Down Under",
+			"michael jackson - bad [1987] - 10 - smooth criminal",
+			"michael jackson - thriller [1984] (r&b) - 04 - thriller",
+			"michael jackson - thriller [1984] (r&b) - 06 - billie jean",
+			"NENA - 99 LUFTBALLONS",
+			"Opus - Live Is Life",
+			"ryan paris - dolce vita",
+			"sabrina - boys",
+			"sandra - everlasting love",
+			"yello - oh yeah",
+		].map(function(id) {
+			return {
+				"id": id,
+				"howl": new Howl({
+					"urls": ["music/" + id + ".ogg", "music/" + id + ".wav"],
+					"loop": true
+				})
 			}
+		});
+		
+		// changes which song actually gets played
+		function switchTo(earworm) {
+			if (earworm == currentWorm) { return; }
+			if (currentWorm) {
+				currentWorm.howl.fadeOut(0, 1000);
+			}
+			earworm.howl.fadeIn(1, 1000);
+			currentWorm = earworm;
+		}
 
       /**
        * Sets up the communication to game pads.
        */
       function setupConsole() {
-				switchTo(earworms[7]);
+		switchTo(earworms[7]);
         airconsole = new AirConsole();
 
         airconsole.onConnect = function(device_id) {
-					avatars.push({
-						"x": 20,
-						"y": 20,
-						"move": { "x": 0, "y": 0},
-						"songId": 0
-					});
+			var newPlayerId = avatars.length;
+			var randomX = Math.random() * 80 + 20;
+			var randomY = Math.random() * 50 + 20;
+			var songId = earworms[newPlayerId % earworms.length];
+			console.log("init player " + newPlayerId + " at (" + randomX + ", " + randomY + ") with song " + earworms[songId] + " (id " + songId + ")");
+				avatars.push({
+					"x": randomX,
+					"y": randomY,
+					"move": { "x": 0, "y": 0},
+					"songId": songId
+				});
+
           checkAtLeastTwoPlayers();
         };
 
@@ -171,12 +179,16 @@
 		{
 			for (j=0;j<avatars.length;j++)
 			{
-				if (i != j)
+				if (i != j && avatars[i].songId != avatars[j].songId)
 				{
 					corners = getConeCorners(avatars[i], 5);
 					if (PointInTriangle({"x": avatars[j].x, "y": avatars[j].y}, corners[0], corners[1], corners[2]))
 					{
-						console.log("Avatar " + j + " inside cone " + i);
+						console.log("Avatar " + j + " inside cone " + i + 
+									" -> change song to " + earworms[avatars[i].songId] + " (id " + avatars[i].songId + ")");
+
+						avatars[j].songId = avatars[i].songId;
+//						switchTo(earworm[avatars[j].songId));
 					}					
 				}
 			}
