@@ -112,8 +112,8 @@
 		
         airconsole.onConnect = function(device_id) {
 			var newPlayerId = avatars.length;
-			var randomX = Math.random() * 80 + 20;
-			var randomY = Math.random() * 50 + 20;
+			var randomX = Math.random() * 120 + 10;
+			var randomY = Math.random() * 80 + 10;
 			var songId = newPlayerId % earworms.length;
 			console.log("init player " + newPlayerId + " at (" + randomX + ", " + randomY + ") with song " + earworms[songId] + " (id " + songId + ")");
 				avatars.push({
@@ -210,8 +210,6 @@
 				{
 					if (withinCone(avatars[i], avatars[j].x, avatars[j].y))
 					{
-						console.log("Avatar " + j + " inside cone " + i + 
-									" -> change song to " + earworms[avatars[i].songId] + " (id " + avatars[i].songId + ")");
 
 						// clear all npcs with the same song id
 						npcs.forEach(function(p) {
