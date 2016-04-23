@@ -342,7 +342,7 @@
 		npcs.forEach(function(n, i) {
 			if (!n.songId && n.songId != 0) { return; }
 			if (n.songId == -1) { return; }
-			ctx.fillStyle = colors[n.songId % colors.length];
+			ctx.fillStyle = "#" + colors[n.songId % colors.length];
 			drawCircle(ctx, n.x, n.y, 2);
 		});
 		
