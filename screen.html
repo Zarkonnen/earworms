@@ -115,7 +115,7 @@
 			var newPlayerId = avatars.length;
 			var randomX = Math.random() * 80 + 20;
 			var randomY = Math.random() * 50 + 20;
-			var songId = earworms[newPlayerId % earworms.length];
+			var songId = newPlayerId % earworms.length;
 			console.log("init player " + newPlayerId + " at (" + randomX + ", " + randomY + ") with song " + earworms[songId] + " (id " + songId + ")");
 				avatars.push({
 					"x": randomX,
@@ -235,7 +235,7 @@
 			{
 				if (npcs[j].songId == -1)
 				{
-					if (PointInTriangle({"x": avatars[j].x, "y": avatars[j].y}, corners[0], corners[1], corners[2]))
+					if (withinCone(avatars[i], npcs[j].x, npcs[j].y))
 					{
 						console.log("NPC " + j + " inside cone " + i + 
 									" -> change song to " + earworms[avatars[i].songId] + " (id " + avatars[i].songId + ")");
@@ -330,11 +330,20 @@
 			drawTriangle(ctx, corners, 'green');*/
 		});
 		
+		npcs.forEach(function(a, i) {
+			ctx.drawImage(npc, c(a.x) - npc.width / 2, c(a.y) - npc.height / 2);
+		});
+		
 		// draw all avatars
 		avatars.forEach(function(a, i) {
 			ctx.fillStyle = "#" + colors[i % colors.length];
 			drawCircle(ctx, a.x, a.y, 2);
 		});
+		
+		/*npcs.forEach(function(a, i) {
+			ctx.fillStyle = "#333333";// + colors[i % colors.length];
+			drawCircle(ctx, a.x, a.y, 2);
+		});*/
 		
 		/*if (avatars.length > 0) {
 			for (var x = 0; x < 100; x++) {
