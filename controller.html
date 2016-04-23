@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="airconsole-controls/joystick/joystick.css">
 <link rel="stylesheet" href="airconsole-controls/ctrl-generator/controller.css">
 </head>
-<body>
+<body id="boday">
 
     <div class="gamepad_container">
       <div id="left" class="left"></div>
@@ -65,6 +65,9 @@
 <script type="text/javascript" src="airconsole-controls/ctrl-generator/ctrl-generator.js"></script>
 <script type="text/javascript">
 var airconsole = new AirConsole({orientation: AirConsole.ORIENTATION_LANDSCAPE});
+airconsole.onActivePlayersChange = function(player) {
+	document.getElementById("right").style.background = "#ff0000";
+};
 CtrlGenerator.setAirConsole(airconsole);
-CtrlGenerator.generate({"left":{"type":{"label":"Joystick","class_name":"Joystick"}},"middle":[],"right":[{"type":{"label":"ButtonVertical","class_name":"Button"},"label":"Play","key":"P","on_up_message":true}]});
+CtrlGenerator.generate({"left":{"type":{"label":"Joystick","class_name":"Joystick"}},"middle":[],"right":[/*{"type":{"label":"ButtonVertical","class_name":"Button"},"label":"Play","key":"P","on_up_message":true}*/]});
 </script></body></html>
