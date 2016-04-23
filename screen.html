@@ -3,6 +3,10 @@
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.3.0.js"></script>
     <script type="text/javascript" src="howler.min.js"></script>
     <script type="text/javascript">
+	var map = new Image(); map.src = "images/map.jpg";
+	var cone = new Image(); cone.src = "images/cone-opaque.png";
+	var npc = new Image(); npc.src = "images/npc.png";
+	
       var airconsole;
       var avatars = [];
 	  var npcs = [];
@@ -86,7 +90,7 @@
 					"y": randomY,
 					"move": { "x": 0, "y": 0},
 					"songId": songId,
-					"coneAngle": 20 * Math.PI / 180,
+					"coneAngle": 15 * Math.PI / 180,
 					"coneRange": 30
 				});
 
@@ -161,7 +165,7 @@
 		p.x += p.move.x*20*delta;
 		p.y += p.move.y*20*delta;
 		p.x = Math.max(0, Math.min(100, p.x));
-		p.y = Math.max(0, Math.min(100, p.y));
+		p.y = Math.max(0, Math.min(132, p.y));
 	  }
 	  
 	  function checkSoundCones() {
@@ -233,6 +237,7 @@
         // Draw
         var ctx = canvas.getContext("2d");
         var zoom = canvas.clientHeight / 100;
+		ctx.drawImage(map, 0, 0, canvas.clientWidth, canvas.clientHeight);
 		var avatarRadius = 5;
 		
 		function c(x) {
@@ -245,6 +250,16 @@
 		
 		// draw all sound cones
 		avatars.forEach(function(a) {
+			ctx.translate(c(a.x), c(a.y));
+			if (a.move.x == 0 && a.move.y == 0) {
+				
+			} else {
+				var angle = Math.atan2(a.move.y, a.move.x);
+				ctx.rotate(angle);
+				ctx.drawImage(cone, -cone.width / 2, -cone.height / 2);
+				ctx.rotate(-angle);
+			}
+			ctx.translate(c(-a.x), c(-a.y));
 			/*var corners = getConeCorners(a, avatarRadius);
 			drawTriangle(ctx, corners, 'green');*/
 		});
@@ -252,10 +267,10 @@
 		// draw all avatars
 		avatars.forEach(function(a, i) {
 			ctx.fillStyle = "#" + colors[i % colors.length];
-			drawCircle(ctx, a.x, a.y, avatarRadius);
+			drawCircle(ctx, a.x, a.y, 2);
 		});
 		
-		if (avatars.length > 0) {
+		/*if (avatars.length > 0) {
 			for (var x = 0; x < 100; x++) {
 				for (var y = 0; y < 100; y++) {
 					if (withinCone(avatars[0], x, y)) {
@@ -263,7 +278,7 @@
 					}
 				}
 			}
-		}
+		}*/
 
 		function drawCircle(context, x, y, radius)
 		{
