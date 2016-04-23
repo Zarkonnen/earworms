@@ -335,7 +335,7 @@
 		avatars.forEach(function(a, i) {
 			if (a.dead) { return; }
 			
-			ctx.fillStyle = "#" + colors[i % colors.length];
+			ctx.fillStyle = "#" + colors[a.songId % colors.length];
 			drawCircle(ctx, a.x, a.y, 2);
 		});
 		
